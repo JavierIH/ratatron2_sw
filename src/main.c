@@ -3,6 +3,7 @@
 #include "timer.h"
 //#include "dma.h"
 #include "uart.h"
+#include "spi.h"
 #include "gpio.h"
 
 
@@ -22,8 +23,12 @@ int main(void){
     //MX_TIM5_Init();
     //MX_USART2_UART_Init();
     //HAL_TIM_Base_Start(&htim5);
+    SPI2_Init();
 
     char text_buffer[1000];
+    uint8_t spi_tx[2];
+    uint8_t spi_rx[10];
+    
     for(int i=0; i<1000; i++){
         text_buffer[i]='X';
     }
@@ -34,12 +39,21 @@ int main(void){
     while(1){
         HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
         //sprintf(text_buffer,"IR T\n\r"); send_uart(text_buffer);
-        //printf("ok\n");
+        printf("ok\r\n");
         //sprintf(text_buffer,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\n");
-        send_uart(text_buffer);
+        //send_uart(text_buffer);
         HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
-        HAL_Delay(100);
+        spi_tx[0] = 0x75;
+
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, 0);
+        HAL_SPI_TransmitReceive(&hspi2, spi_tx, spi_tx, 2, 1000);
+        //while(hspi2.State == HAL_SPI_STATE_BUSY);  // wait xmission complete
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, 1);
+
+        printf("%02X", spi_tx[1]);
+
+        HAL_Delay(1);
     }
 }
 

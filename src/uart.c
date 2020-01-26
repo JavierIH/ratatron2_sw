@@ -48,7 +48,7 @@ int _write(int file, char *data, int size){
         return -1;
     }
     HAL_StatusTypeDef status = HAL_UART_Transmit(&huart2, (uint8_t*)data, size, 1000);
-    return (status == HAL_OK ? len : 0);
+    return (status == HAL_OK ? size : 0);
 }
 
 void send_uart(char* data){
