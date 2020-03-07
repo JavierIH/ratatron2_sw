@@ -44,16 +44,20 @@ int main(void){
         //send_uart(text_buffer);
         HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
-        spi_tx[0] = 0x75;
+        spi_tx[0] = 0x80 | 0x75;
 
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, 0);
-        HAL_SPI_TransmitReceive(&hspi2, spi_tx, spi_tx, 2, 1000);
+        //HAL_SPI_TransmitReceive(&hspi2, spi_tx, spi_tx, 3, 1000);
         //while(hspi2.State == HAL_SPI_STATE_BUSY);  // wait xmission complete
+        HAL_SPI_Transmit(&hspi2,spi_tx, 1, 100);
+        HAL_SPI_Receive(&hspi2,spi_rx, 1, 100);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, 1);
 
-        printf("%02X", spi_tx[1]);
 
-        HAL_Delay(1);
+
+        printf("%02X", spi_rx[0]);
+
+        HAL_Delay(50);
     }
 }
 
